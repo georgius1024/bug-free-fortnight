@@ -5,7 +5,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest"
   },
   "devDependencies": {
     "@nuxt/test-utils": "^3.0.0",
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "@picocss/pico": "^1.5.6",
+    "dayjs": "^1.11.7",
     "nanoid": "^4.0.0"
   }
 }
