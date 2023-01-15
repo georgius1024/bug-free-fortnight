@@ -12,17 +12,20 @@ const fileName = process.env.NODE_ENV === 'test' ? "fragments.test.json" : "frag
 const dbFileName: string = path.resolve(__dirname, "..", "db", fileName);
 
 const data: Promise<FragmentDatabase> = load();
-
-async function load(): Promise<FragmentDatabase> {
+async function loadAndParse(): Promise<Fragment[]> {
   try {
     await fs.access(dbFileName);
     const contents: string = await fs.readFile(dbFileName, {
       encoding: "utf8",
     });
-    return { items: JSON.parse(contents) };
-  } catch (e){
-    return { items: [] };
+    return JSON.parse(contents) as Fragment[];
+  } catch {
+    return [];
   }
+
+}
+async function load(): Promise<FragmentDatabase> {
+  return { items: await loadAndParse() };
 }
 
 async function save(): Promise<void> {
@@ -30,6 +33,11 @@ async function save(): Promise<void> {
   return fs.writeFile(dbFileName, JSON.stringify(fragments.items), {
     encoding: "utf8",
   });
+}
+
+async function reset() {
+  const fragments: FragmentDatabase = await data;
+  fragments.items = await loadAndParse();
 }
 
 async function list(search: string = ""): Promise<Fragment[]> {
@@ -42,7 +50,7 @@ async function list(search: string = ""): Promise<Fragment[]> {
   return fragments.items;
 }
 
-async function show(id: string): Promise<Fragment|undefined> {
+async function show(id: string): Promise<Fragment | undefined> {
   const fragments: FragmentDatabase = await data;
   return fragments.items.find((item: Fragment): Boolean => item.id === id)
 }
@@ -63,7 +71,7 @@ async function update(id: string, fragment: Fragment): Promise<void> {
   const fragments: FragmentDatabase = await data;
   fragments.items = fragments.items.map((item: Fragment): Fragment => {
     if (item.id === id) {
-      return {...fragment, updatedAt: new Date()}
+      return { ...fragment, updatedAt: new Date() }
     }
     return item
   });
@@ -80,6 +88,7 @@ async function destroy(id: string): Promise<void> {
 
 export default {
   dbFileName,
+  reset,
   list,
   show,
   add,

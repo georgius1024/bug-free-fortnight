@@ -1,5 +1,5 @@
 export interface Fragment {
-  id: string;
+  id?: string;
   name: string,
   description: string;
   createdAt?: Date | string;

@@ -25,17 +25,38 @@ describe('fragments DB', () => {
     await fs.writeFile(subject.dbFileName, JSON.stringify(fragments), {
       encoding: "utf8",
     })
+    await subject.reset()
   })
   it('loads without error', () => {
     expect(subject).toHaveProperty('list')
     expect(subject).toHaveProperty('add')
   })
-  it('lists saved fragments', async () => {
+  it('lists fragments', async () => {
     const list:Fragment[] = await subject.list()
     expect(list).toHaveLength(fragments.length)
     expect(list).toHaveProperty("0.name", fragments[0].name)
     expect(list).toHaveProperty("1.name", fragments[1].name)
   })
+  it('shows fragment', async () => {
+    const id: string = fragments.at(0)?.id ?? ''
+    const item:Fragment|undefined = await subject.show(id)
+    expect(item).toBeDefined()
+    expect(item?.id).toBe(id)
+  })
+  it('adds fragment', async () => {
+    const item:Fragment = {
+      name: 'New',
+      description: 'added'
+    }
+    const id = await subject.add(item)
+    expect(id).toBeDefined()
+
+    // |undefined = await subject.show(fragments[0].id)
+    // expect(item).toBeDefined()
+    // expect(item?.id).toBe(fragments[0].id)
+    // expect(item?.name).toBe(fragments[0].name)
+  })
+
 })
 // import { setup, $fetch } from '@nuxt/test-utils'
 // describe('My test', async () => {
