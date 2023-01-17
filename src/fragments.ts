@@ -65,29 +65,34 @@ async function create(fragment: Fragment): Promise<Fragment> {
     ...fragment,
     id,
     createdAt: new Date(),
-  }
+  };
   fragments.items.push(payload);
   save();
   return payload;
 }
 
-async function update(id: string, fragment: Fragment): Promise<void> {
+async function update(id: string, fragment: Fragment): Promise<Fragment> {
   const fragments: FragmentDatabase = await data;
+  const payload = { id, ...fragment, updatedAt: new Date() };
   fragments.items = fragments.items.map((item: Fragment): Fragment => {
     if (item.id === id) {
-      return { ...fragment, updatedAt: new Date() };
+      return payload;
     }
     return item;
   });
   save();
+  return payload;
 }
 
-async function destroy(id: string): Promise<void> {
+async function destroy(id: string): Promise<string|undefined> {
   const fragments: FragmentDatabase = await data;
-  fragments.items = fragments.items.filter((item: Fragment): Boolean => {
-    return item.id === id;
-  });
-  save();
+  const length = fragments.items.length
+  fragments.items = fragments.items.filter(
+    (item: Fragment): Boolean => item.id !== id
+  );
+  if (length > fragments.items.length) {
+    return id;
+  }
 }
 
 export default {
