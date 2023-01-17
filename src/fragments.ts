@@ -8,8 +8,7 @@ interface FragmentDatabase {
   items: Fragment[];
 }
 
-const fileName = process.env.NODE_ENV === 'test' ? "fragments.test.json" : "fragments.json"
-const dbFileName: string = path.resolve(__dirname, "..", "db", fileName);
+const dbFileName: string = path.resolve("db", "fragments.json");
 
 const data: Promise<FragmentDatabase> = load();
 async function loadAndParse(): Promise<Fragment[]> {
@@ -22,7 +21,6 @@ async function loadAndParse(): Promise<Fragment[]> {
   } catch {
     return [];
   }
-
 }
 async function load(): Promise<FragmentDatabase> {
   return { items: await loadAndParse() };
@@ -35,12 +33,17 @@ async function save(): Promise<void> {
   });
 }
 
-async function reset() {
+async function reload() {
   const fragments: FragmentDatabase = await data;
   fragments.items = await loadAndParse();
 }
 
-async function list(search: string = ""): Promise<Fragment[]> {
+async function replace(items: Fragment[]) {
+  const fragments: FragmentDatabase = await data;
+  fragments.items = [...items.map((e) => ({ ...e }))];
+}
+
+async function index(search: string = ""): Promise<Fragment[]> {
   const fragments: FragmentDatabase = await data;
   if (search) {
     return fragments.items.filter((item: Fragment): boolean =>
@@ -52,28 +55,29 @@ async function list(search: string = ""): Promise<Fragment[]> {
 
 async function show(id: string): Promise<Fragment | undefined> {
   const fragments: FragmentDatabase = await data;
-  return fragments.items.find((item: Fragment): Boolean => item.id === id)
+  return fragments.items.find((item: Fragment): Boolean => item.id === id);
 }
 
-async function add(fragment: Fragment): Promise<string> {
+async function create(fragment: Fragment): Promise<Fragment> {
   const fragments: FragmentDatabase = await data;
-  const id: string = nanoid()
-  fragments.items.push({
+  const id: string = nanoid();
+  const payload = {
     ...fragment,
     id,
-    createdAt: new Date()
-  });
+    createdAt: new Date(),
+  }
+  fragments.items.push(payload);
   save();
-  return id
+  return payload;
 }
 
 async function update(id: string, fragment: Fragment): Promise<void> {
   const fragments: FragmentDatabase = await data;
   fragments.items = fragments.items.map((item: Fragment): Fragment => {
     if (item.id === id) {
-      return { ...fragment, updatedAt: new Date() }
+      return { ...fragment, updatedAt: new Date() };
     }
-    return item
+    return item;
   });
   save();
 }
@@ -81,17 +85,18 @@ async function update(id: string, fragment: Fragment): Promise<void> {
 async function destroy(id: string): Promise<void> {
   const fragments: FragmentDatabase = await data;
   fragments.items = fragments.items.filter((item: Fragment): Boolean => {
-    return (item.id === id)
-  })
+    return item.id === id;
+  });
   save();
 }
 
 export default {
   dbFileName,
-  reset,
-  list,
+  reload,
+  replace,
+  index,
   show,
-  add,
+  create,
   update,
-  destroy
-}
+  destroy,
+};

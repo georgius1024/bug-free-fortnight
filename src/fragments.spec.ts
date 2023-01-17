@@ -1,6 +1,5 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import fs from "fs/promises";
-import path from "path";
 import dayjs from 'dayjs'
 import subject from '@/src/fragments'
 import { Fragment } from "../src/types";
@@ -20,22 +19,30 @@ const fragments: Fragment[] = [
   }
 ]
 
+fs.access = vi.fn().mockResolvedValue(true)
+fs.readFile = vi.fn().mockResolvedValue(JSON.stringify(fragments))
+fs.writeFile = vi.fn().mockResolvedValue(true)
+
 describe('fragments DB', () => {
   beforeEach(async () => {    
-    await fs.writeFile(subject.dbFileName, JSON.stringify(fragments), {
-      encoding: "utf8",
-    })
-    await subject.reset()
+    await subject.reload()
   })
   it('loads without error', () => {
-    expect(subject).toHaveProperty('list')
-    expect(subject).toHaveProperty('add')
+    expect(subject).toHaveProperty('index')
+    expect(subject).toHaveProperty('show')
+    expect(subject).toHaveProperty('create')
+    expect(subject).toHaveProperty('update')
+    expect(subject).toHaveProperty('destroy')
   })
   it('lists fragments', async () => {
-    const list:Fragment[] = await subject.list()
+    const list:Fragment[] = await subject.index()
     expect(list).toHaveLength(fragments.length)
     expect(list).toHaveProperty("0.name", fragments[0].name)
     expect(list).toHaveProperty("1.name", fragments[1].name)
+  })
+  it('lists can search fragments', async () => {
+    const list:Fragment[] = await subject.index('1')
+    expect(list).toHaveLength(1)
   })
   it('shows fragment', async () => {
     const id: string = fragments.at(0)?.id ?? ''
@@ -43,27 +50,37 @@ describe('fragments DB', () => {
     expect(item).toBeDefined()
     expect(item?.id).toBe(id)
   })
-  it('adds fragment', async () => {
+  it('creates fragment', async () => {
     const item:Fragment = {
       name: 'New',
       description: 'added'
     }
-    const id = await subject.add(item)
+    const id = await subject.create(item)
     expect(id).toBeDefined()
+    const list:Fragment[] = await subject.index()
+    expect(list).toHaveLength(fragments.length + 1)
 
-    // |undefined = await subject.show(fragments[0].id)
-    // expect(item).toBeDefined()
-    // expect(item?.id).toBe(fragments[0].id)
-    // expect(item?.name).toBe(fragments[0].name)
+    const found = await subject.show(id)
+    expect(found).toBeDefined()
+    expect(found?.id).toBe(id)
   })
+  it('updates fragment', async () => {
+    const id: string = fragments.at(0)?.id ?? ''
+    const item:Fragment = {...fragments[0] as Fragment,
+      name: 'Updated',
+    }
+    await subject.update(id, item)
 
+    const updated = await subject.show(id)
+    expect(updated).toBeDefined()
+    expect(updated?.id).toBe(id)
+    expect(updated?.name).toBe(item.name)
+    expect(updated?.updatedAt).toBeDefined()
+  })
+  it('destroys fragment', async () => {
+    const id: string = fragments.at(0)?.id ?? ''
+    await subject.destroy(id)
+    const list = await subject.index()
+    expect(list).toHaveLength(fragments.length - 1)
+  })
 })
-// import { setup, $fetch } from '@nuxt/test-utils'
-// describe('My test', async () => {
-//   await setup({
-//     // test context options
-//   })
-//   test('my test', () => {
-//     // ...
-//   })
-// })
