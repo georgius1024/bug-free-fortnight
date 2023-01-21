@@ -5,3 +5,8 @@ export interface Fragment {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+
+export interface Stats{
+  id?: string;
+  size: number
+}
