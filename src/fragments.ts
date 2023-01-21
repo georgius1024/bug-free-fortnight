@@ -3,6 +3,7 @@ import path from "path";
 import { nanoid } from "nanoid";
 
 import { Fragment } from "../src/types";
+import { isTemplateNode } from "@vue/compiler-core";
 
 interface FragmentDatabase {
   items: Fragment[];
@@ -73,10 +74,10 @@ async function create(fragment: Fragment): Promise<Fragment> {
 
 async function update(id: string, fragment: Fragment): Promise<Fragment> {
   const fragments: FragmentDatabase = await data;
-  const payload = { id, ...fragment, updatedAt: new Date() };
+  const payload = { ...fragment, updatedAt: new Date() };
   fragments.items = fragments.items.map((item: Fragment): Fragment => {
     if (item.id === id) {
-      return payload;
+      return {...item, ...payload};
     }
     return item;
   });
@@ -84,15 +85,17 @@ async function update(id: string, fragment: Fragment): Promise<Fragment> {
   return payload;
 }
 
-async function destroy(id: string): Promise<string|undefined> {
+async function destroy(id: string): Promise<string | null> {
   const fragments: FragmentDatabase = await data;
-  const length = fragments.items.length
+  const length = fragments.items.length;
   fragments.items = fragments.items.filter(
     (item: Fragment): Boolean => item.id !== id
   );
+  save();
   if (length > fragments.items.length) {
     return id;
   }
+  return null;
 }
 
 export default {

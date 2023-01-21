@@ -55,14 +55,14 @@ describe('fragments DB', () => {
       name: 'New',
       description: 'added'
     }
-    const id = await subject.create(item)
-    expect(id).toBeDefined()
+    const created = await subject.create(item)
+    expect(created).toBeDefined()
     const list:Fragment[] = await subject.index()
     expect(list).toHaveLength(fragments.length + 1)
 
-    const found = await subject.show(id)
+    const found = await subject.show(created?.id || '')
     expect(found).toBeDefined()
-    expect(found?.id).toBe(id)
+    expect(found?.id).toBe(created.id)
   })
   it('updates fragment', async () => {
     const id: string = fragments.at(0)?.id ?? ''

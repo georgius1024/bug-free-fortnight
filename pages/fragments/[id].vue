@@ -20,7 +20,7 @@
     </template>
     <template v-if="stats?.size">
       <label>Download DOC ({{ stats.size }})</label>
-      <a href="`/files/${item.id}`">Download</a>
+      <a :href="`/api/files/${item.id}`">Download</a>
     </template>
     <p><NuxtLink :to="back">Back</NuxtLink></p>
   </template>
@@ -49,7 +49,7 @@ const upload = async (item: Fragment | null) => {
     const formData = new FormData();
     formData.append("id", item.id);
     formData.append("file", uploadFile.value);
-    const { pending } = useLazyFetch<Fragment>(`/api/fragments/upload`, {
+    const { pending } = useLazyFetch<Fragment>(`/api/files/upload`, {
       method: "post",
       body: formData,
     });
