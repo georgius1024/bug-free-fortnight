@@ -1,7 +1,33 @@
 <template>
-  <div class="flex items-center justify-center h-full flex-col">
-    <h1>Index page</h1>
-    <p><NuxtLink to="/fragments">Fragments</NuxtLink></p>
-    <p><NuxtLink to="/replacements">Replacements</NuxtLink></p>
-  </div>
+  <h1>Setup</h1>
+  <template v-if="loadingFragments || loadingComposition">
+    Loading
+  </template>
+  <template v-else>
+    <Composer :composition="composition || []" :fragments="fragments || []" @change="updated" />
+  </template>
+
 </template>
+<script setup lang="ts">
+import Composer from "~~/components/Composer.vue";
+import { Fragment, Composition } from "~~/src/types";
+
+const { data: fragments, pending: loadingFragments } = useLazyFetch<Fragment[]>("/api/fragments");
+const { data: composition, pending: loadingComposition } = useLazyFetch<Composition>("/api/composition");
+
+// const composition = useCookie<Composition>('composition')
+// console.log(composition.value, typeof composition.value)
+
+const updated = async (data: any) => {
+  composition.value = data
+
+  const { error } = await useLazyFetch<Composition>("/api/composition", {
+    method: "put",
+    body: data,
+  })
+
+  if (error.value) {
+    console.log(error.value);
+  }
+}
+</script>

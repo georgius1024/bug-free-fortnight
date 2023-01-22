@@ -18,3 +18,5 @@ export interface Replacement {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+
+export type Composition = Fragment[];

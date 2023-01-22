@@ -23,7 +23,7 @@ fs.access = vi.fn().mockResolvedValue(true)
 fs.readFile = vi.fn().mockResolvedValue(JSON.stringify(fragments))
 fs.writeFile = vi.fn().mockResolvedValue(true)
 
-describe('fragments DB', () => {
+describe('Replacement DB', () => {
   beforeEach(async () => {    
     await subject.reload()
   })
@@ -34,23 +34,23 @@ describe('fragments DB', () => {
     expect(subject).toHaveProperty('update')
     expect(subject).toHaveProperty('destroy')
   })
-  it('lists fragments', async () => {
+  it('lists Replacement', async () => {
     const list:Replacement[] = await subject.index()
     expect(list).toHaveLength(fragments.length)
     expect(list).toHaveProperty("0.id", fragments[0].id)
     expect(list).toHaveProperty("1.id", fragments[1].id)
   })
-  it('lists can search fragments', async () => {
+  it('lists can search Replacement', async () => {
     const list:Replacement[] = await subject.index('1')
     expect(list).toHaveLength(1)
   })
-  it('shows replacement', async () => {
+  it('shows Replacement', async () => {
     const id: string = fragments.at(0)?.id ?? ''
     const item:Replacement|undefined = await subject.show(id)
     expect(item).toBeDefined()
     expect(item?.id).toBe(id)
   })
-  it('creates replacement', async () => {
+  it('creates Replacement', async () => {
     const item:Replacement = {
       code: 'New',
       replacement: 'added'
@@ -83,7 +83,6 @@ describe('fragments DB', () => {
     const result = await subject.destroy(id)
     expect(result).toBeTruthy()
     const list = await subject.index()
-    console.log(result, list)
     expect(list).toHaveLength(fragments.length - 1)
   })
 })
