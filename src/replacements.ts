@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { nanoid } from "nanoid";
 
 import { Replacement } from "./types";
 
@@ -54,17 +55,19 @@ async function index(search: string = ""): Promise<Replacement[]> {
   return Replacements.items;
 }
 
-async function show(code: string): Promise<Replacement | undefined> {
+async function show(id: string): Promise<Replacement | undefined> {
   const Replacements: ReplacementDatabase = await data;
   return Replacements.items.find(
-    (item: Replacement): Boolean => item.code === code
+    (item: Replacement): Boolean => item.id === id
   );
 }
 
 async function create(replacement: Replacement): Promise<Replacement> {
   const Replacements: ReplacementDatabase = await data;
+  const id: string = nanoid();
   const payload = {
     ...replacement,
+    id,
     createdAt: new Date(),
   };
   Replacements.items.push(payload);
@@ -73,14 +76,14 @@ async function create(replacement: Replacement): Promise<Replacement> {
 }
 
 async function update(
-  code: string,
+  id: string,
   replacement: Replacement
 ): Promise<Replacement> {
   const Replacements: ReplacementDatabase = await data;
   const payload = { ...replacement, updatedAt: new Date() };
   Replacements.items = Replacements.items.map(
     (item: Replacement): Replacement => {
-      if (item.code === code) {
+      if (item.id === id) {
         return { ...item, ...payload };
       }
       return item;
@@ -90,14 +93,15 @@ async function update(
   return payload;
 }
 
-async function destroy(code: string): Promise<string | null> {
+async function destroy(id: string): Promise<string | null> {
   const Replacements: ReplacementDatabase = await data;
   const length = Replacements.items.length;
   Replacements.items = Replacements.items.filter(
-    (item: Replacement): Boolean => item.code !== code
+    (item: Replacement): Boolean => item.id !== id
   );
+  save();
   if (length > Replacements.items.length) {
-    return code;
+    return id;
   }
   return null;
 }

@@ -10,7 +10,7 @@
         <div class="text-slate-200 text-sm text-right" @click="destroy(item.id)">[delete]</div>
       </li>
     </ul>
-    <p><NuxtLink :to="`fragments/new`">New</NuxtLink></p>
+    <p><NuxtLink to="fragments/new">New</NuxtLink></p>
     <p><NuxtLink to="../">Back</NuxtLink></p>
   </div>
 </template>

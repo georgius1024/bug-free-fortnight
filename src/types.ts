@@ -12,6 +12,7 @@ export interface Stats {
 }
 
 export interface Replacement {
+  id?: string;
   code: string;
   replacement: string;
   createdAt?: Date | string;

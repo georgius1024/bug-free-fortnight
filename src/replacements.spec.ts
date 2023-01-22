@@ -6,11 +6,13 @@ import { Replacement } from "./types";
 
 const fragments: Replacement[] = [
   {
+    id: '1',
     code: 'CODE1',
     replacement: 'REPL1',
     createdAt: dayjs('2022-01-01T12:30:00').toDate()
   },
   {
+    id: '2',
     code: 'CODE2',
     replacement: 'REPL3',
     createdAt: dayjs('2022-01-01T12:35:00').toDate()
@@ -35,18 +37,18 @@ describe('fragments DB', () => {
   it('lists fragments', async () => {
     const list:Replacement[] = await subject.index()
     expect(list).toHaveLength(fragments.length)
-    expect(list).toHaveProperty("0.code", fragments[0].code)
-    expect(list).toHaveProperty("1.code", fragments[1].code)
+    expect(list).toHaveProperty("0.id", fragments[0].id)
+    expect(list).toHaveProperty("1.id", fragments[1].id)
   })
   it('lists can search fragments', async () => {
     const list:Replacement[] = await subject.index('1')
     expect(list).toHaveLength(1)
   })
   it('shows replacement', async () => {
-    const code: string = fragments.at(0)?.code ?? ''
-    const item:Replacement|undefined = await subject.show(code)
+    const id: string = fragments.at(0)?.id ?? ''
+    const item:Replacement|undefined = await subject.show(id)
     expect(item).toBeDefined()
-    expect(item?.code).toBe(code)
+    expect(item?.id).toBe(id)
   })
   it('creates replacement', async () => {
     const item:Replacement = {
@@ -55,29 +57,33 @@ describe('fragments DB', () => {
     }
     const created = await subject.create(item)
     expect(created).toBeDefined()
-    const list:Replacement[] = await subject.index()
+    expect(created).toHaveProperty('id')
+    expect(created).toHaveProperty('createdAt')
+    const list = await subject.index()
     expect(list).toHaveLength(fragments.length + 1)
-    const found = await subject.show(item.code)
+    const found = await subject.show(created?.id || '')
     expect(found).toBeDefined()
-    expect(found?.code).toBe(item.code)
+    expect(created).toHaveProperty('code', item.code)
   })
   it('updates replacement', async () => {
-    const code: string = fragments.at(0)?.code ?? ''
+    const id: string = fragments.at(0)?.id ?? ''
     const item:Replacement = {...fragments[0] as Replacement,
       replacement: 'Updated',
     }
-    await subject.update(code, item)
+    await subject.update(id, item)
 
-    const updated = await subject.show(code)
+    const updated = await subject.show(id)
     expect(updated).toBeDefined()
-    expect(updated?.code).toBe(code)
-    expect(updated?.code).toBe(item.code)
-    expect(updated?.updatedAt).toBeDefined()
+    expect(updated).toHaveProperty('id')
+    expect(updated).toHaveProperty('replacement', item.replacement)
+    expect(updated).toHaveProperty('updatedAt')
   })
   it('destroys replacement', async () => {
-    const code: string = fragments.at(0)?.code ?? ''
-    await subject.destroy(code)
+    const id: string = fragments.at(0)?.id ?? ''
+    const result = await subject.destroy(id)
+    expect(result).toBeTruthy()
     const list = await subject.index()
+    console.log(result, list)
     expect(list).toHaveLength(fragments.length - 1)
   })
 })
