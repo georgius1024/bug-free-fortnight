@@ -2,22 +2,9 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import fs from "fs/promises";
 import dayjs from 'dayjs'
 import subject from '@/src/composition'
-import { Fragment,Composition } from "../src/types";
+import { Composition } from "../src/types";
 
-const composition: Composition = [
-  {
-    id: '101',
-    name: 'Item1',
-    description: 'desc1',
-    createdAt: dayjs('2022-01-01T12:30:00').toDate()
-  },
-  {
-    id: '102',
-    name: 'Item2',
-    description: 'desc2',
-    createdAt: dayjs('2022-01-01T12:35:00').toDate()
-  }
-]
+const composition: Composition = ['101', '102']
 
 fs.access = vi.fn().mockResolvedValue(true)
 fs.readFile = vi.fn().mockResolvedValue(JSON.stringify(composition))
@@ -37,7 +24,7 @@ describe('composition DB', () => {
     expect(list).toHaveLength(composition.length)
   })
   it('updates composition', async () => {
-    const changed = [...composition, {id: '101', name: 'Up', description: 'Desc'}]
+    const changed = [...composition, '109']
     const list = await subject.update(changed)
     expect(list).toBeDefined()
     expect(list).toHaveLength(changed.length)

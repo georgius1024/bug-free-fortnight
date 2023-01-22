@@ -5,7 +5,7 @@
         <div class="element">{{ element.name }}</div>
       </template>
     </draggable>
-    <draggable :modelValue="composition" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
+    <draggable :modelValue="compositionItems" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
       <template #item="{ element }">
         <div class="element">
           {{ element.name }}
@@ -36,14 +36,19 @@ const emit = defineEmits(["change"]);
 const list: Ref<Fragment[]> = ref([]);
 
 const notUsed = computed(() => {
-  const used = props.composition.map((e) => e.id);
   return props.fragments.filter(
-    (item) => !used.includes((item as Fragment).id)
+    (item) => !props.composition.includes((item?.id || ''))
   );
 });
 
-const updated = (list: Composition) => {
-  emit("change", list);
+const compositionItems = computed(() => {
+  const fragments = new Map()
+  props.fragments.forEach(item => fragments.set(item.id, item))
+  return props.composition.map(id => fragments.get(id))
+});
+
+const updated = (list: Fragment[]) => {
+  emit("change", list.map(item => item?.id || ''));
 };
 </script>
 <style scoped type="text/scss">
