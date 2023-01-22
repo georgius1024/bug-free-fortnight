@@ -1,6 +1,10 @@
 <template>
   <div class="composer">
+    
     <draggable :modelValue="notUsed" itemKey="id" group="grags" :sort="false" class="sidebar">
+      <template #header>
+        <h2 class="text-white m-0">Fragments</h2>
+      </template>      
       <template #item="{ element }">
         <div class="element">
           {{ element.name }}
@@ -10,6 +14,9 @@
       </template>
     </draggable>
     <draggable :modelValue="compositionItems" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
+      <template #header>
+        <h2 class="text-white m-0">Composition</h2>
+      </template>      
       <template #item="{ element }">
         <div class="element">
           {{ element.name }}
