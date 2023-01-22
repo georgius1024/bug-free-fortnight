@@ -1,5 +1,5 @@
 <template>
-  <h1>Setup</h1>
+  <h1 class="my-2">Setup</h1>
   <template v-if="loadingFragments || loadingComposition">
     Loading
   </template>

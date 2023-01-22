@@ -64,7 +64,7 @@ const updated = (list: Fragment[]) => {
 </script>
 <style scoped type="text/scss">
 .composer {
-  height: calc(100vh - 400px);
+  height: calc(100vh - 300px);
   border: 1px solid #ccc;
   display: flex;
 }
