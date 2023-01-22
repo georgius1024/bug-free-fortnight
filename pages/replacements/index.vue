@@ -1,57 +1,118 @@
 <template>
   <template v-if="loading"> loading </template>
-  <template v-else>
+  <template v-else-if="items?.length">
     <h1>Replacements</h1>
     <table>
       <thead>
-        <th>Code</th>
-        <th>Replacement</th>
+        <tr>
+          <th>Code</th>
+          <th>&nbsp;</th>
+          <th>Replacement</th>
+          <th>&nbsp;</th>
+        </tr>
       </thead>
       <tbody>
-        <tr v-for="item in items" :key="item.code">
-          <td>{{ item.code }}</td>
-          <td>{{ item.replacement }}</td>
+        <tr v-for="item in items" valign="middle">
           <td>
-            <div
-              class="text-slate-200 text-sm text-right"
-              @click="destroy(item.code)"
-            >
-              [delete]
-            </div>
+            <input
+              :value="item.code"
+              class="mb-0"
+              @change="update(item, 'code', $event)"
+            />
+          </td>
+          <td class="text-center">=&gt;</td>
+          <td>
+            <input
+              :value="item.replacement"
+              class="mb-0"
+              @change="update(item, 'replacement', $event)"
+            />
+          </td>
+          <td class="text-center">
+            <RemoveButton :disabled="destroing" @remove="destroy(item)"/>
           </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <th colspan="100%" class="text-right">
-            <button @click="create">Add</button>
+            <button :disabled="creating" @click="create">Add replacement</button>
           </th>
         </tr>
       </tfoot>
     </table>
-    {{ items }}
+  </template>
+  <template v-else>
+    <h1>No replacements</h1>
+    <button :disabled="creating" @click="create">Create replacement</button>
   </template>
 </template>
 
 <script setup lang="ts">
+import RemoveButton from "~~/components/RemoveButton.vue";
 import { Replacement } from "~~/src/types";
 
 const { data: items, pending: loading } =
   useLazyFetch<Replacement[]>("/api/replacements");
 
+const creating = ref(false);
+const create = async () => {
+  creating.value = true;
+  const { data: created, error } = await useFetch<Replacement>(
+    "/api/replacements",
+    {
+      method: "post",
+      body: { code: "", replacement: "" },
+    }
+  );
+  creating.value = false;
 
-const create = () => {
-  if (items.value) {
-    items.value = [...items.value, {code: '', replacement: ''}]
+  if (items.value && created.value) {
+    items.value = [...items.value, created.value];
   }
-}
+  if (error.value) {
+    console.log(error.value);
+  }
+};
 
-const destroy = (code: string) => {
-  useFetch(`/api/replacements/${code}`, { method: "delete" })
-    .then(() => {
-      items.value = items.value && items.value.filter((e) => e.code !== code);
-      alert("deleted");
-    })
-    .catch((e) => alert(e));
+const updating = ref(false);
+const update = async (item: Replacement, key: string, event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  const { id = "" } = item;
+  updating.value = true;
+  const { data: updated, error } = await useFetch<Replacement>(
+    `/api/replacements/${id}`,
+    {
+      method: "put",
+      body: { ...item, [key]: value },
+    }
+  );
+  updating.value = false;
+
+  if (items.value && updated.value) {
+    const updatedItems = items.value.map((item) => {
+      if (item.id === id) {
+        return updated.value;
+      }
+      return item;
+    });
+    items.value = updatedItems as Replacement[];
+  }
+  if (error.value) {
+    console.log(error.value);
+  }
+};
+
+const destroing = ref(false);
+const destroy = async (item: Replacement) => {
+  const { id = "" } = item;
+  destroing.value = true
+  const {error} = await useFetch(`/api/replacements/${id}`, { method: "delete" })
+  destroing.value = false
+  items.value = items.value && items.value.filter((e) => e.id !== id);
+  if (error.value) {
+    console.log(error.value);
+  }
+  setTimeout(() => alert("deleted"), 0)
 };
 </script>

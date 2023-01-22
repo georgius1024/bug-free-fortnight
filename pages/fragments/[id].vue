@@ -1,12 +1,12 @@
 <template>
   <template v-if="loading">
-    <p>Loading...</p>
+    <p>Loading</p>
   </template>
   <template v-else-if="item">
     <label>Name</label>
     <input v-model="item.name" />
     <label>Description</label>
-    <textarea v-model="item.description">{{ item.description }}</textarea>
+    <textarea v-model="item.description" rows="6">{{ item.description }}</textarea>
     <button @click="save">Save</button>
     <template v-if="item.id">
       <hr />
@@ -60,39 +60,6 @@ const upload = async (item: Fragment | null) => {
   }
 };
 
-// function load(id: string | string[]): Ref<Fragment | null> {
-//   console.log(ssr)
-//   if (!ssr) {
-//     loading.value = true;
-//   }
-//   if (id === "new") {
-//     loading.value = false;
-//     return ref({ name: "", description: "" });
-//   }
-//   const { data, pending } = useLazyFetch<Fragment>(`/api/fragments/${id}`);
-//   watch(pending, (pending) => {
-//     loading.value = pending;
-//   });
-
-//   return data;
-// }
-
-// const item = await loadAsync(id); //ref({ name: "", description: "" })
-
-// async function loadAsync(id: string | string[]): Promise<Ref<Fragment|null>> {
-//   return new Promise(resolve => {
-//     if (id === "new") {
-//       resolve(ref({ name: "New", description: "New" }));
-//     } else {
-//       loading.value = true;
-//       useFetch<Fragment>(`/api/fragments/${id}`).then(({data, error}) => {
-//         resolve(data)
-//         loading.value = false;
-//       })
-//     }
-//   })
-// }
-
 const item: Ref<Fragment | null> = ref(null);
 const stats: Ref<Stats | null> = ref(null);
 if (id === "new") {
@@ -118,7 +85,7 @@ const save = () =>
     body: item.value,
   })
     .then(() => {
-      alert("saved!");
+      setTimeout(() => alert("saved"), 0)
       navigateTo(back);
     })
     .catch((error) => alert(error));
