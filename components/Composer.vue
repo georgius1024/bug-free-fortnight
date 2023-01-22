@@ -7,7 +7,10 @@
     </draggable>
     <draggable :modelValue="composition" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
       <template #item="{ element }">
-        <div class="element">{{ element.name }}</div>
+        <div class="element">
+          {{ element.name }}
+          <p v-if="element.description" v-html="element.description"/>
+        </div>
       </template>
     </draggable>
   </div>
@@ -53,6 +56,7 @@ const updated = (list: Composition) => {
 .sidebar {
   max-height: 100%;
   width: 33%;
+  min-width: 33%;
   background-color: #333;
   overflow-y: auto;
   padding: 6px;
