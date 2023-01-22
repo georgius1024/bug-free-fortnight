@@ -2,7 +2,11 @@
   <div class="composer">
     <draggable :modelValue="notUsed" itemKey="id" group="grags" :sort="false" class="sidebar">
       <template #item="{ element }">
-        <div class="element">{{ element.name }}</div>
+        <div class="element">
+          {{ element.name }}
+          <p v-if="element.description" class="brief" v-html="element.description"/>
+
+        </div>
       </template>
     </draggable>
     <draggable :modelValue="compositionItems" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
@@ -73,7 +77,12 @@ const updated = (list: Fragment[]) => {
   background-color: #111;
   flex-grow: 1;
 }
-
+.brief {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
 .element {
   padding: 8px;
   border-radius: 16px;
