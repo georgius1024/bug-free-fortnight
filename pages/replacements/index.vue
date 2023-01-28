@@ -43,8 +43,8 @@
     </table>
   </template>
   <template v-else>
-    <h1>No replacements</h1>
-    <button :disabled="creating" @click="create">Create replacement</button>
+    <h1>Нет подстановок</h1>
+    <button :disabled="creating" @click="create">Создать подстановку</button>
   </template>
 </template>
 
