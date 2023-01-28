@@ -1,11 +1,10 @@
 <template>
-  <h1 class="my-2">Setup</h1>
   <template v-if="loadingFragments || loadingComposition">
-    Loading
+    Идет загрузка...
   </template>
   <template v-else>
     <Composer :composition="composition || []" :fragments="fragments || []" @change="updated" />
-    <button class="mt-4" @click="download">Get composition</button>
+    <button class="mt-4" @click="download">Скачать документ</button>
   </template>
 
 </template>

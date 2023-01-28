@@ -1,7 +1,7 @@
 <template>
   <template v-if="loading"> loading </template>
   <template v-else-if="items?.length">
-    <h1>Fragments</h1>
+    <h1>Фрагменты</h1>
     <ul class="list-none">
       <li v-for="item in items" :key="item.id" class="list-none block">
         <div>
@@ -11,11 +11,11 @@
         <div class="mr-10">{{ item.description }}</div>
       </li>
     </ul>
-    <NuxtLink tag="button" to="fragments/new"><button>Create fragment</button></NuxtLink>
+    <NuxtLink tag="button" to="fragments/new"><button>Создать фрагмент</button></NuxtLink>
   </template>
   <template v-else>
-    <h1>No replacements</h1>
-    <NuxtLink tag="button" to="fragments/new"><button>Create fragment</button></NuxtLink>
+    <h1>Нет ни одного фрагмента</h1>
+    <NuxtLink tag="button" to="fragments/new"><button>Создать фрагмент</button></NuxtLink>
   </template>
 </template>
 <script setup lang="ts">

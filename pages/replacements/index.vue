@@ -1,13 +1,13 @@
 <template>
   <template v-if="loading"> loading </template>
   <template v-else-if="items?.length">
-    <h1>Replacements</h1>
+    <h1>Подстановки</h1>
     <table>
       <thead>
         <tr>
-          <th>Code</th>
+          <th>Код</th>
           <th>&nbsp;</th>
-          <th>Replacement</th>
+          <th>Замена</th>
           <th>&nbsp;</th>
         </tr>
       </thead>
@@ -36,7 +36,7 @@
       <tfoot>
         <tr>
           <th colspan="100%" class="text-right">
-            <button :disabled="creating" @click="create">Add replacement</button>
+            <button :disabled="creating" @click="create">Создать подстановку</button>
           </th>
         </tr>
       </tfoot>

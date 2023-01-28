@@ -1,6 +1,6 @@
 import BusBoy from "busboy";
 
-export default function formData(event) {
+export default function FormData(event) {
   const request = event.node.req;
   const parser = BusBoy({ headers: request.headers });
   const files = [];

@@ -3,7 +3,7 @@
     
     <draggable :modelValue="notUsed" itemKey="id" group="grags" :sort="false" class="sidebar">
       <template #header>
-        <h2 class="text-white m-0">Fragments</h2>
+        <h2 class="text-white m-0">Фрагменты</h2>
       </template>      
       <template #item="{ element }">
         <div class="element">
@@ -15,7 +15,7 @@
     </draggable>
     <draggable :modelValue="compositionItems" itemKey="id" group="grags" class="composition" @update:modelValue="updated">
       <template #header>
-        <h2 class="text-white m-0">Composition</h2>
+        <h2 class="text-white m-0">Композиция</h2>
       </template>      
       <template #item="{ element }">
         <div class="element">
@@ -64,7 +64,7 @@ const updated = (list: Fragment[]) => {
 </script>
 <style scoped type="text/scss">
 .composer {
-  height: calc(100vh - 300px);
+  height: calc(100vh - 200px);
   border: 1px solid #ccc;
   display: flex;
 }

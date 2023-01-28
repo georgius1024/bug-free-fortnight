@@ -3,26 +3,28 @@
     <p>Loading</p>
   </template>
   <template v-else-if="item">
-    <label>Name</label>
+    <label>Название</label>
     <input v-model="item.name" />
-    <label>Description</label>
+    <label>Описание</label>
     <textarea v-model="item.description" rows="6">{{ item.description }}</textarea>
-    <button @click="save">Save</button>
+    <button @click="save">Сохранить</button>
     <template v-if="item.id">
       <hr />
-      <label>Upload DOC</label>
+      <label>Загрузить фрагмент (файл *.docx)</label>
       <input
         @change="setUploadFile"
         type="file"
         accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       />
-      <button :disabled="uploadPending" @click="upload(item)">Upload</button>
+      <button :disabled="uploadPending" @click="upload(item)">Загрузить</button>
     </template>
     <template v-if="stats?.size">
-      <label>Download DOC ({{ stats.size }})</label>
-      <a :href="`/api/files/${item.id}`">Download</a>
+      <a :href="`/api/files/${item.id}`" class="flex">
+        <svg width="32" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>download-box</title><path d="M5 3H19C20.11 3 21 3.9 21 5V19C21 20.11 20.11 21 19 21H5C3.9 21 3 20.11 3 19V5C3 3.9 3.9 3 5 3M8 17H16V15H8V17M16 10H13.5V7H10.5V10H8L12 14L16 10Z" /></svg>
+        <label>Скачать фрагмент (docx, {{ stats.size }})</label>
+      </a>
     </template>
-    <p><NuxtLink :to="back">Back</NuxtLink></p>
+    <p><NuxtLink :to="back">Назад</NuxtLink></p>
   </template>
 </template>
 <script setup lang="ts">
@@ -34,6 +36,8 @@ const route = useRoute();
 const { id } = route.params;
 
 const uploadFile = ref<File | null>();
+
+const back = "/fragments";
 
 const setUploadFile = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -56,6 +60,10 @@ const upload = async (item: Fragment | null) => {
     uploadPending.value = pending.value;
     watch(pending, (pending) => {
       uploadPending.value = pending;
+      if (!pending) {
+        setTimeout(() => alert("saved"), 0)
+        navigateTo(back);
+      }
     });
   }
 };
@@ -76,7 +84,6 @@ useFetch<Stats>(`/api/stats/${id}`).then(({ data, error }) => {
   stats.value = data.value;
 });
 
-const back = "/fragments";
 const url = id === "new" ? "/api/fragments" : `/api/fragments/${id}`;
 const method = id === "new" ? "post" : "put";
 const save = () =>

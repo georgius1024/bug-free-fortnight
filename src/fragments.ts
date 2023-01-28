@@ -51,7 +51,7 @@ async function index(search: string = ""): Promise<Fragment[]> {
       item.description.toUpperCase().includes(search.toUpperCase())
     );
   }
-  return fragments.items;
+  return fragments.items.sort((a,b) => a.name.localeCompare(b.name));
 }
 
 async function show(id: string): Promise<Fragment | undefined> {
