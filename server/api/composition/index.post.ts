@@ -4,16 +4,12 @@ import path from "path";
 import { Replacement } from "@/src/types";
 import composition from "@/src/composition";
 import replacements from "@/src/replacements";
-import concatDocs from "@/src/ConcatDocs";
-import mergeFields from "@/src/MergeFields";
-import { defineSSRCustomElement } from "nuxt/dist/app/compat/capi";
+import transformDocs from "@/src/TransformDocs";
 
 export default defineEventHandler(async (event) => {
 
   const idList = await composition.show();
   const files = idList.map(id => path.resolve("files", "fragments", `${id}.docx`))
-  const rawName = path.resolve("output.raw.docx")
-  await concatDocs(files, rawName)
   const list = await replacements.index()
   const fields = list.reduce((fields: Object, item: Replacement) => {
     return {
@@ -23,7 +19,7 @@ export default defineEventHandler(async (event) => {
   }, {})
 
   const composedName = path.resolve("composed.docx")
-  await mergeFields(rawName, fields, composedName)
+  await transformDocs(fields, files, composedName)
 
   const res = event.node.res;
   const stats = await fs.stat(composedName);
@@ -37,7 +33,6 @@ export default defineEventHandler(async (event) => {
   const s = createReadStream(composedName);
   s.pipe(res);
   s.on("end", () => {
-    fs.unlink(rawName)
     fs.unlink(composedName)
     res.end()
   });
